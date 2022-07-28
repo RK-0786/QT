@@ -37,6 +37,51 @@ void MainWindow::SetupGame()
     {
         button->setVisible(true);
         int index = rand() % animalEmoji->count();
+        QString nextEmoji = (*animalEmoji)[index];
+        button->setText(nextEmoji);
+        animalEmoji->removeAt(index);
+        connect(button,SIGNAL(clicked()),this,SLOT(ButtonClicked()));
+    }
 
+    timer->start();
+    tenthsOfSecondsElapsed = 0;
+    matchesFound = 0;
+
+    delete animalEmoji;
+    animalEmoji = nullptr;
+}
+
+void MainWindow::TimerTick()
+{
+    tenthsOfSecondsElapsed++;
+    ui->label->setText(QString::number(tenthsOfSecondsElapsed/10.0f,'f',1));
+    if(matchesFound == 8)
+    {
+        timer->stop();
+        ui->label->setText("Your time : " + QString::number(tenthsOfSecondsElapsed/10.0f,'f',1) + "seconds!");
+    }
+}
+
+void MainWindow::ButtonClicked()
+{
+    QPushButton* button = qobject_cast<QPushButton*>(sender());
+    if(finding_match == false)
+    {
+        button->setVisible(false);
+        lastEmojiClicked = button;
+        finding_match = true;
+    }
+    else if(button->text() == lastEmojiClicked->text())
+    {
+        button->setText("✔");
+        lastEmojiClicked->setVisible(true);
+        lastEmojiClicked->setText("✔");
+        finding_match = false;
+        matchesFound++;
+    }
+    else
+    {
+        lastEmojiClicked->setVisible(true);
+        finding_match = false;
     }
 }
